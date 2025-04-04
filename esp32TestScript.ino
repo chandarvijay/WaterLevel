@@ -205,6 +205,82 @@ button{
 }
 
 
+
+
+void config(){
+
+char config [] PROGMEM = R"===(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Settings</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+
+        #container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+</style>
+
+</head>
+<body>
+    
+<h1>WiFi Configuration</h1>
+<div id="container">
+<label for="ssid">SSID:</label>
+<input type="text" id="ssid" name="ssid"><br><br>
+<label for="password">Password:</label>
+<input type="password" id="password" name="password"><br><br>
+<button id="submit">Submit</button>
+<button id="reset">Reset</button>
+</div>
+</body>
+</html>)===";
+
+server.send(200,"text/html",config);
+
+
+}
+
+
+
+
 void setup() {
 
 
@@ -228,6 +304,8 @@ void setup() {
     Serial.print(WiFi.localIP());
   }
   server.on("/", welcome);
+  server.on("/config",config);
+
   server.begin();
 
 
