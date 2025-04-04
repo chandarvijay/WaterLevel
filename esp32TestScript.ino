@@ -5,7 +5,7 @@
 
 
 //int builtinled = T2;
-//int Relay = 15;
+int Relay = 5;
 const char* ssid = "Uma Nelayam 4G";
 const char* password = "9980337734";
 
@@ -235,7 +235,7 @@ void setup() {
   pinMode(echo,INPUT);
   pinMode(triggerpin,OUTPUT);
  // pinMode(led, OUTPUT);
- // pinMode(Relay, OUTPUT);
+  pinMode(Relay, OUTPUT);
 }
 void loop() {
 
@@ -244,12 +244,25 @@ void loop() {
 digitalWrite(triggerpin,LOW);
 delayMicroseconds(20);
 
+digitalWrite(triggerpin,HIGH);
+delayMicroseconds(10);
+digitalWrite(triggerpin,LOW);
+
 duration = pulseIn(echo,HIGH);
 distance =(duration/2)*0.343;
 
 Serial.print("The distance is \n");
 Serial.print(distance);
+Serial.print("The time taken");
+Serial.print(duration);
 
+if(distance <= 160){
+
+digitalWrite(Relay,HIGH);
+
+} else{
+    digitalWrite(Relay,LOW);
+}
 
 
 
