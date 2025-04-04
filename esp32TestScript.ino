@@ -14,12 +14,13 @@ float distance;
 float duration;
 
 int triggerpin = 15;
-//int relay = 5;
 int echo =4 ;
 
+int second_echo = 18;
+int second_trigger = 19;
 
-
-
+float seconddistance;
+float secondduration;
 
 
 WebServer server(80);
@@ -236,6 +237,10 @@ void setup() {
   pinMode(triggerpin,OUTPUT);
  // pinMode(led, OUTPUT);
   pinMode(Relay, OUTPUT);
+  pinMode(second_echo,INPUT);
+  pinMode(second_trigger,OUTPUT);
+
+
 }
 void loop() {
 
@@ -244,6 +249,10 @@ void loop() {
 digitalWrite(triggerpin,LOW);
 delayMicroseconds(20);
 
+
+
+
+
 digitalWrite(triggerpin,HIGH);
 delayMicroseconds(10);
 digitalWrite(triggerpin,LOW);
@@ -251,12 +260,24 @@ digitalWrite(triggerpin,LOW);
 duration = pulseIn(echo,HIGH);
 distance =(duration/2)*0.343;
 
-Serial.print("The distance is \n");
-Serial.print(distance);
-Serial.print("The time taken");
-Serial.print(duration);
 
-if(distance <= 160){
+digitalWrite(second_trigger,LOW);
+delayMicroseconds(20);
+
+digitalWrite(second_trigger,HIGH);
+delayMicroseconds(10);
+digitalWrite(second_trigger,LOW);
+
+secondduration = pulseIn(second_echo,HIGH);
+seconddistance =(secondduration/2)*0.343;
+
+
+Serial.print("The distance of the first is \n");
+Serial.print(distance);
+Serial.print("The distance of the second is \n");
+Serial.print(seconddistance);
+
+if(distance <= 160 || seconddistance <= 160 ){
 
 digitalWrite(Relay,HIGH);
 
