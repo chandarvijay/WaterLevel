@@ -2,7 +2,8 @@
 #include "WiFi.h"
 #include "WebServer.h"
 #include "WebSocketsServer.h"
-
+#include "HTTPClient.h"
+#include "ArduinoJson.h"
 
 //int builtinled = T2;
 int Relay = 5;
@@ -36,8 +37,15 @@ void welcome() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Page</title>
-    <script src="script.js" defer></script>
+    <title>WaterLevel Controller</title>
+    <script>
+    
+    let dis = 'http://192.168.1.69/test';
+    
+    document.getElementById("swaterper").value = dis[0];
+    </script>
+
+    
 <style>
 h1{
 background-color: rgb(99, 99, 176);
@@ -134,6 +142,8 @@ button{
 </style>
 
 
+
+
 <!DOCTYPE html>
 
 
@@ -142,14 +152,14 @@ button{
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Page</title>
+    <title>WaterController</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" async></script>
 
 </head>
 <body>
     <header>
-        <h1>WaterLevel Controller </h1>
+        <h1>Water Level Controller </h1>
     </header>
     <main>
         <section>
@@ -158,7 +168,7 @@ button{
             <label for="fname">Water Percentage</label><br>
             <input type="text" id="swaterper" name="fname" value="%"><br><br>
 
-            <progress id="file" value="%" max="100"> 90% </progress><br><br>
+            <progress id="file" value="%" max="100"> {distance} </progress><br><br>
 
             <label class="switch">
                 <input type="checkbox" checked>
@@ -238,14 +248,14 @@ char config [] PROGMEM = R"===(<!DOCTYPE html>
         }
         button {
             padding: 10px 15px;
-            background-color: #28a745;
+            background-color: #2b4abb;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
         button:hover {
-            background-color: #218838;
+            background-color: #1258a9;
         }
 
         #container {
@@ -281,6 +291,23 @@ server.send(200,"text/html",config);
 
 
 
+void senddata(){
+
+ StaticJsonDocument<300> JSONData; 
+
+  JSONData["FIrst Ultrasonic Sensor"] = distance;
+  JSONData["Second Ultrasonic Sensor"] = seconddistance;
+
+
+  char data[300];
+  serializeJson(JSONData,data);
+server.send(200,"application/json",data);
+
+}
+
+
+
+
 void setup() {
 
 
@@ -305,6 +332,7 @@ void setup() {
   }
   server.on("/", welcome);
   server.on("/config",config);
+  server.on("/test",HTTP_GET,senddata);
 
   server.begin();
 
@@ -322,13 +350,29 @@ void setup() {
 }
 void loop() {
 
+
+
+//Http Post 
+
+  HTTPClient http;
+
+  http.begin("http:192.168.1.65/config"); 
+  http.addHeader("Content-type", "application/json" );
+  int httpResponsecoce = http.POST("Posting from esp32");
+
+  if (httpResponsecoce > 0) {
+
+    String response = http.getString();
+    Serial.print("httpResponsecoce");
+    Serial.print("response");
+
+  }
+
+
 //Ultrasonic 
 
 digitalWrite(triggerpin,LOW);
 delayMicroseconds(20);
-
-
-
 
 
 digitalWrite(triggerpin,HIGH);
