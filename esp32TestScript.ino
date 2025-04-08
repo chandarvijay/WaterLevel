@@ -11,6 +11,7 @@ const char* ssid = "Uma Nelayam 4G";
 const char* password = "9980337734";
 
 
+
 float distance;
 float duration;
 
@@ -28,7 +29,7 @@ WebServer server(80);
 
 WebSocketsServer WS = WebSocketsServer(81);
 
-
+// function HOME Page containing HTML CSS and Javascript 
 void welcome() {
 
   char test[] PROGMEM = R"===(<!DOCTYPE html>
@@ -38,11 +39,25 @@ void welcome() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WaterLevel Controller</title>
-    <script>
+
+    <script type="text/javascript"> 
+
+
+    socket = new WebSocket('ws://192.168.1.69:81');
+    socket.onopen = function(e){console.log("[socket]socket.onopen ");};
+
+    socket.onmessage = function(e){
+        console.log("[socket]message: ", e.data);
+        document.getElementById("swaterper").value = e.data;
+        document.getElementById("twaterper").value = e.data;
+    };
+    socket.onclose = function(e){console.log("[socket]socket.onclose");};
+    socket.onerror = function(error){console.log("[socket]socket.onerror: ", error);};  
     
-    let dis = 'http://192.168.1.69/test';
-    
-    document.getElementById("swaterper").value = dis[0];
+  
+
+
+
     </script>
 
     
@@ -140,23 +155,8 @@ button{
     border-radius: 50%;
   }
 </style>
-
-
-
-
-<!DOCTYPE html>
-
-
-
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WaterController</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" async></script>
-
 </head>
+
 <body>
     <header>
         <h1>Water Level Controller </h1>
@@ -167,7 +167,6 @@ button{
             <p>Sump tank that is pumped up to the water tank</p>
             <label for="fname">Water Percentage</label><br>
             <input type="text" id="swaterper" name="fname" value="%"><br><br>
-
             <progress id="file" value="%" max="100"> {distance} </progress><br><br>
 
             <label class="switch">
@@ -215,7 +214,7 @@ button{
 }
 
 
-
+// function HTML Page containing HTML and CSS for updating WiFi Password 
 
 void config(){
 
@@ -289,14 +288,14 @@ server.send(200,"text/html",config);
 }
 
 
-
+//function  Json data Posing Json out of Ultrsonic sensor to webpage
 
 void senddata(){
 
  StaticJsonDocument<300> JSONData; 
 
-  JSONData["FIrst Ultrasonic Sensor"] = distance;
-  JSONData["Second Ultrasonic Sensor"] = seconddistance;
+  JSONData["FIrstUltrasonicSensor"] = distance;
+  JSONData["SecondUltrasonicSensor"] = seconddistance;
 
 
   char data[300];
@@ -307,6 +306,39 @@ server.send(200,"application/json",data);
 
 
 
+void webSocketEvent(uint8_t num,WStype_t type,uint8_t * payload, size_t length)
+{
+
+ switch (type) {
+    case WStype_DISCONNECTED:
+      Serial.printf("[%u] Disconnected!\n", num);
+      break;
+
+    case WStype_CONNECTED: {
+        IPAddress ip = WS.remoteIP(num);
+        Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+        // send message to client
+        WS.sendTXT(num, "0");
+      }
+      break;
+
+    case WStype_TEXT:
+      Serial.printf("[%u] get Text: %s\n", num, payload);
+      // send message to client
+      // webSocket.sendTXT(num, "message here");
+      // send data to all connected clients
+      // webSocket.broadcastTXT("message here");
+      break;
+      
+    case WStype_BIN:
+      Serial.printf("[%u] get binary length: %u\n", num, length);
+      //hexdump(payload, length);
+      // send message to client
+      // webSocket.sendBIN(num, payload, length);
+      break;
+  }
+
+}
 
 void setup() {
 
@@ -333,8 +365,9 @@ void setup() {
   server.on("/", welcome);
   server.on("/config",config);
   server.on("/test",HTTP_GET,senddata);
-
   server.begin();
+  WS.begin();
+  WS.onEvent(webSocketEvent);
 
 
 
@@ -413,6 +446,13 @@ digitalWrite(Relay,HIGH);
   server.handleClient();
   server.send(200, "text/html");
   server.send(404, "text/html");
+
+
+//WebSockets 
+
+String value = String(distance,8);
+            WS.loop();
+            WS.broadcastTXT(value);
 
 
 }
