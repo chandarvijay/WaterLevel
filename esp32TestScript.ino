@@ -43,18 +43,39 @@ void welcome() {
     <script type="text/javascript"> 
 
 
-    socket = new WebSocket('ws://192.168.1.69:81');
-    socket.onopen = function(e){console.log("[socket]socket.onopen ");};
+socket = new WebSocket('ws://192.168.1.69:81');
 
-    socket.onmessage = function(e){
-        console.log("[socket]message: ", e.data);
-        document.getElementById("swaterper").value = e.data;
-        document.getElementById("twaterper").value = e.data;
-    };
-    socket.onclose = function(e){console.log("[socket]socket.onclose");};
-    socket.onerror = function(error){console.log("[socket]socket.onerror: ", error);};  
-    
-  
+socket.onopen = function (e) {
+    console.log("[socket]socket.onopen");
+};
+
+socket.onmessage = function (e) {
+    console.log("[socket]message: ", e.data);
+
+    try {
+        // Parse the incoming data as JSON
+        const data = JSON.parse(e.data);
+
+        // Update the respective elements based on the data
+        if (data.swaterper !== undefined) {
+            document.getElementById("swaterper").value = data.swaterper;
+        }
+        if (data.twaterper !== undefined) {
+            document.getElementById("twaterper").value = data.twaterper;
+        }
+    } catch (error) {
+        console.error("[socket]Error parsing message: ", error);
+    }
+};
+
+socket.onclose = function (e) {
+    console.log("[socket]socket.onclose");
+};
+
+socket.onerror = function (error) {
+    console.log("[socket]socket.onerror: ", error);
+};
+
 
 
 
@@ -449,10 +470,20 @@ digitalWrite(Relay,HIGH);
 
 
 //WebSockets 
+//String usvalue = String(seconddistance,2);
+//String value = String(distance,2);
+  //          WS.loop();
+    //        WS.broadcastTXT(value);
+     //       WS.broadcastTXT(usvalue);
+ StaticJsonDocument<200> JSONData;
+    JSONData["swaterper"] = distance;
+    JSONData["twaterper"] = seconddistance;
 
-String value = String(distance,8);
-            WS.loop();
-            WS.broadcastTXT(value);
+    char data[200];
+    serializeJson(JSONData, data);
+    WS.broadcastTXT(data);
+    WS.loop();
+
 
 
 }
