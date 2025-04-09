@@ -59,9 +59,11 @@ socket.onmessage = function (e) {
         // Update the respective elements based on the data
         if (data.swaterper !== undefined) {
             document.getElementById("swaterper").value = data.swaterper;
+            document.getElementById("file").value = data.swaterper;
         }
         if (data.twaterper !== undefined) {
             document.getElementById("twaterper").value = data.twaterper;
+             document.getElementById("watertankper").value = data.twaterper;
         }
     } catch (error) {
         console.error("[socket]Error parsing message: ", error);
@@ -188,7 +190,7 @@ button{
             <p>Sump tank that is pumped up to the water tank</p>
             <label for="fname">Water Percentage</label><br>
             <input type="text" id="swaterper" name="fname" value="%"><br><br>
-            <progress id="file" value="%" max="100"> {distance} </progress><br><br>
+            <progress id="file" value="%" max="100">  </progress><br><br>
 
             <label class="switch">
                 <input type="checkbox" checked>
