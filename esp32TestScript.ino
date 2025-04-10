@@ -4,25 +4,27 @@
 #include "WebSocketsServer.h"
 #include "HTTPClient.h"
 #include "ArduinoJson.h"
+#include "ArduinoOTA.h"
 
 //int builtinled = T2;
-int Relay = 5;
+int Relay = 4;
 const char* ssid = "Uma Nelayam 4G";
 const char* password = "9980337734";
-
+const char* ota_password = "12345";
 
 
 float distance;
 float duration;
 
 int triggerpin = 15;
-int echo =4 ;
+int echo = 5 ;
 
-int second_echo = 18;
-int second_trigger = 19;
+int second_echo = 19;
+int second_trigger = 18;
 
 float seconddistance;
 float secondduration;
+
 
 
 WebServer server(80);
@@ -43,7 +45,7 @@ void welcome() {
     <script type="text/javascript"> 
 
 
-socket = new WebSocket('ws://192.168.1.69:81');
+socket = new WebSocket('ws://192.168.1.78:81');
 
 socket.onopen = function (e) {
     console.log("[socket]socket.onopen");
@@ -58,8 +60,8 @@ socket.onmessage = function (e) {
 
         // Update the respective elements based on the data
         if (data.swaterper !== undefined) {
-            document.getElementById("swaterper").value = data.swaterper;
-            document.getElementById("file").value = data.swaterper;
+            document.getElementById("swaterper").value = data.swaterper+"%";
+            document.getElementById("file").value = data.swaterper+"%";
         }
         if (data.twaterper !== undefined) {
             document.getElementById("twaterper").value = data.twaterper;
@@ -177,6 +179,35 @@ button{
   .slider.round:before {
     border-radius: 50%;
   }
+
+  #watertank1{
+    position: absolute;
+    top: 25%;
+    left: 42%;
+    border: #1274d6c9;
+    border-style: solid;
+    height: 200px;
+    width: 10%;
+    background-color: #ffffffc9;
+    border-radius: 10px;
+    
+
+  }
+
+
+#sumptank{
+    position: absolute;
+    top: 63%;
+    left: 28%;
+    border: #1274d6c9;
+    border-style: solid;
+    height: 220px;
+    width: 30%;
+    background-color: #ffffffc9;
+    border-radius: 10px;
+
+  }
+
 </style>
 </head>
 
@@ -186,11 +217,23 @@ button{
     </header>
     <main>
         <section>
-            <h2>SUMP Water Level</h2>
+        <h1>Server IP address</h1>
+            <h2>SUMP Water Level</h2> 
             <p>Sump tank that is pumped up to the water tank</p>
             <label for="fname">Water Percentage</label><br>
             <input type="text" id="swaterper" name="fname" value="%"><br><br>
             <progress id="file" value="%" max="100">  </progress><br><br>
+
+            <div id="watertank">
+               
+                <div class="water-level" id="water-level"></div>
+                <div class="water-level" id="water-level2"></div>
+                <div class="water-level" id="water-level3"></div>
+                <div class="water-level" id="water-level4"></div>
+                <div class="water-level" id="water-level5"></div>
+    
+            </div>
+
 
             <label class="switch">
                 <input type="checkbox" checked>
@@ -209,6 +252,8 @@ button{
             <label for="fname">Water Percentage</label><br>
             <input type="text" id="twaterper" name="fname" value="%"><br><br>
             <progress id="watertankper" value ="%" max="100"> 90% </progress><br><br>
+
+
 
             <label class="switch">
                 <input type="checkbox" checked>
@@ -321,6 +366,7 @@ void senddata(){
   JSONData["SecondUltrasonicSensor"] = seconddistance;
 
 
+
   char data[300];
   serializeJson(JSONData,data);
 server.send(200,"application/json",data);
@@ -367,7 +413,7 @@ void setup() {
 
 
   Serial.begin(115200);
-  
+  ArduinoOTA.setPassword(ota_password);
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
@@ -384,7 +430,10 @@ void setup() {
     Serial.print("wifi connected ");
 
     Serial.print(WiFi.localIP());
+
   }
+
+  ArduinoOTA.begin();
   server.on("/", welcome);
   server.on("/config",config);
   server.on("/test",HTTP_GET,senddata);
@@ -407,15 +456,15 @@ void setup() {
 void loop() {
 
 
-
+ArduinoOTA.handle();
 //Http Post 
 
   HTTPClient http;
 
-  http.begin("http:192.168.1.65/config"); 
+  http.begin("http:192.168.1.78/config"); 
   http.addHeader("Content-type", "application/json" );
   int httpResponsecoce = http.POST("Posting from esp32");
-
+  
   if (httpResponsecoce > 0) {
 
     String response = http.getString();
