@@ -25,7 +25,7 @@ int second_trigger = 18;
 float seconddistance;
 float secondduration;
 
-
+float ipaddress = WiFi.localIP();
 
 WebServer server(80);
 
@@ -45,7 +45,7 @@ void welcome() {
     <script type="text/javascript"> 
 
 
-socket = new WebSocket('ws://192.168.1.78:81');
+socket = new WebSocket('ws://192.168.1.72:81');
 
 socket.onopen = function (e) {
     console.log("[socket]socket.onopen");
@@ -60,11 +60,11 @@ socket.onmessage = function (e) {
 
         // Update the respective elements based on the data
         if (data.swaterper !== undefined) {
-            document.getElementById("swaterper").value = data.swaterper+"%";
-            document.getElementById("file").value = data.swaterper+"%";
+            document.getElementById("swaterper").value = data.swaterper+"CM";
+            document.getElementById("file").value = data.swaterper;
         }
         if (data.twaterper !== undefined) {
-            document.getElementById("twaterper").value = data.twaterper;
+            document.getElementById("twaterper").value = data.twaterper +"CM" ;
              document.getElementById("watertankper").value = data.twaterper;
         }
     } catch (error) {
@@ -217,11 +217,11 @@ button{
     </header>
     <main>
         <section>
-        <h1>Server IP address</h1>
+        <h1>{ipaddress}</h1>
             <h2>SUMP Water Level</h2> 
             <p>Sump tank that is pumped up to the water tank</p>
             <label for="fname">Water Percentage</label><br>
-            <input type="text" id="swaterper" name="fname" value="%"><br><br>
+            <input type="text" id="swaterper" name="fname" value="CM"><br><br>
             <progress id="file" value="%" max="100">  </progress><br><br>
 
             <div id="watertank">
@@ -250,7 +250,7 @@ button{
             <h2>Sintex Water Tank</h2>
             <p>Water Tank Place on the Builing </p>
             <label for="fname">Water Percentage</label><br>
-            <input type="text" id="twaterper" name="fname" value="%"><br><br>
+            <input type="text" id="twaterper" name="fname" value="CM"><br><br>
             <progress id="watertankper" value ="%" max="100"> 90% </progress><br><br>
 
 
@@ -433,6 +433,8 @@ void setup() {
 
   }
 
+
+
   ArduinoOTA.begin();
   server.on("/", welcome);
   server.on("/config",config);
@@ -461,7 +463,7 @@ ArduinoOTA.handle();
 
   HTTPClient http;
 
-  http.begin("http:192.168.1.78/config"); 
+  http.begin("http://192.168.1.72/config"); 
   http.addHeader("Content-type", "application/json" );
   int httpResponsecoce = http.POST("Posting from esp32");
   
@@ -485,7 +487,7 @@ delayMicroseconds(10);
 digitalWrite(triggerpin,LOW);
 
 duration = pulseIn(echo,HIGH);
-distance =(duration/2)*0.343;
+distance =(duration/2)*0.034;
 
 
 digitalWrite(second_trigger,LOW);
@@ -496,7 +498,7 @@ delayMicroseconds(10);
 digitalWrite(second_trigger,LOW);
 
 secondduration = pulseIn(second_echo,HIGH);
-seconddistance =(secondduration/2)*0.343;
+seconddistance =(secondduration/2)*0.034;
 
 
 Serial.print("The distance of the first is \n");
