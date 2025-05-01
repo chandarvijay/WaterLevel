@@ -1,0 +1,28 @@
+
+.sump{
+
+    background-color: #D9D9D9;
+    width: 457px;
+    height: 199px;
+    position: relative;
+    left: 700px;
+    top: -1000px;
+
+}
+
+.sump .sumptank{
+
+    background-color: #90B6E7;
+    width: 382px;
+    height: 147px;
+    position: relative;
+    left: 35px;
+    top: -10px;
+    border-radius: 5px;
+
+}
+
+h2{
+    text-align: center;
+
+}

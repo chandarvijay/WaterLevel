@@ -16,16 +16,16 @@ const char* ota_password = "12345";
 float distance;
 float duration;
 
-int triggerpin = 15;
-int echo = 5 ;
+int triggerpin = 13;
+int echo = 12 ;
 
-int second_echo = 19;
-int second_trigger = 18;
+int second_echo = 14;
+int second_trigger = 27;
 
 float seconddistance;
 float secondduration;
 
-float ipaddress = WiFi.localIP();
+
 
 WebServer server(80);
 
@@ -45,7 +45,7 @@ void welcome() {
     <script type="text/javascript"> 
 
 
-socket = new WebSocket('ws://192.168.1.72:81');
+socket = new WebSocket('ws://192.168.1.77:81');
 
 socket.onopen = function (e) {
     console.log("[socket]socket.onopen");
@@ -217,7 +217,6 @@ button{
     </header>
     <main>
         <section>
-        <h1>{ipaddress}</h1>
             <h2>SUMP Water Level</h2> 
             <p>Sump tank that is pumped up to the water tank</p>
             <label for="fname">Water Percentage</label><br>
@@ -463,7 +462,7 @@ ArduinoOTA.handle();
 
   HTTPClient http;
 
-  http.begin("http://192.168.1.72/config"); 
+  http.begin("http://192.168.1.77/config"); 
   http.addHeader("Content-type", "application/json" );
   int httpResponsecoce = http.POST("Posting from esp32");
   
@@ -483,7 +482,7 @@ delayMicroseconds(20);
 
 
 digitalWrite(triggerpin,HIGH);
-delayMicroseconds(10);
+delayMicroseconds(20);
 digitalWrite(triggerpin,LOW);
 
 duration = pulseIn(echo,HIGH);
@@ -494,7 +493,7 @@ digitalWrite(second_trigger,LOW);
 delayMicroseconds(20);
 
 digitalWrite(second_trigger,HIGH);
-delayMicroseconds(10);
+delayMicroseconds(20);
 digitalWrite(second_trigger,LOW);
 
 secondduration = pulseIn(second_echo,HIGH);
