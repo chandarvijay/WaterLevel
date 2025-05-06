@@ -7,7 +7,7 @@
 #include "ArduinoOTA.h"
 
 //int builtinled = T2;
-int Relay = 4;
+int Relay = 15;
 const char* ssid = "Uma Nelayam 4G";
 const char* password = "9980337734";
 const char* ota_password = "12345";
@@ -25,7 +25,7 @@ int second_trigger = 27;
 float seconddistance;
 float secondduration;
 
-
+// No changes made today 
 
 WebServer server(80);
 
@@ -46,9 +46,18 @@ void welcome() {
 
 
 socket = new WebSocket('ws://192.168.1.77:81');
+let heartbeatInterval;
 
 socket.onopen = function (e) {
     console.log("[socket]socket.onopen");
+
+    heartbeatInterval = setInterval(() => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "ping" }));
+                console.log("[socket]Heartbeat sent");
+            }
+        }, 30000); // 30 seconds
+
 };
 
 socket.onmessage = function (e) {
@@ -281,78 +290,6 @@ button{
 }
 
 
-// function HTML Page containing HTML and CSS for updating WiFi Password 
-
-void config(){
-
-char config [] PROGMEM = R"===(<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi Settings</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #2b4abb;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #1258a9;
-        }
-
-        #container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-</style>
-
-</head>
-<body>
-    
-<h1>WiFi Configuration</h1>
-<div id="container">
-<label for="ssid">SSID:</label>
-<input type="text" id="ssid" name="ssid"><br><br>
-<label for="password">Password:</label>
-<input type="password" id="password" name="password"><br><br>
-<button id="submit">Submit</button>
-<button id="reset">Reset</button>
-</div>
-</body>
-</html>)===";
-
-server.send(200,"text/html",config);
-
-
-}
 
 
 //function  Json data Posing Json out of Ultrsonic sensor to webpage
@@ -436,7 +373,7 @@ void setup() {
 
   ArduinoOTA.begin();
   server.on("/", welcome);
-  server.on("/config",config);
+
   server.on("/test",HTTP_GET,senddata);
   server.begin();
   WS.begin();
@@ -505,15 +442,15 @@ Serial.print(distance);
 Serial.print("The distance of the second is \n");
 Serial.print(seconddistance);
 
-if(distance <= 160 || seconddistance <= 160 ){
+if(distance > 70 && seconddistance < 70 ){
 
 digitalWrite(Relay,HIGH);
 
-} else{
-    digitalWrite(Relay,LOW);
+}else if(distance <= 20 )
+{
+  digitalWrite(Relay, LOW);
+
 }
-
-
 
 //Webserver 
   server.handleClient();

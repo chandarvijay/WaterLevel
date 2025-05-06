@@ -13,7 +13,7 @@ function Sidebar(){
                     <title>Water Level</title>
         </head>
         <body>
-<div  className='container'>
+<div  className='sidebarcontainer'>
         <ul className='show-sidebar'>
             <ol className='sidebarhome'>HOME</ol>
             <ol className='sidebardashboard'>Dashboard</ol>

@@ -1,28 +1,81 @@
-
 .sump{
 
     background-color: #D9D9D9;
-    width: 457px;
-    height: 199px;
-    position: relative;
-    left: 700px;
-    top: -1000px;
+    border-color: black;
+    width: 1160px;
+    height: 100px;
 
 }
 
-.sump .sumptank{
-
-    background-color: #90B6E7;
-    width: 382px;
-    height: 147px;
+.watersource {
     position: relative;
-    left: 35px;
+    left: 250px;
+    display:inline-flex;
+    gap: 60px;
+
+}
+
+.watersource .Borewellstatus{
+    position: relative;
+    background-color: #dc1212;
+    border-radius: 50%;
+    margin: 0px;
+    width: 30px;
+    height: 30px;
+    border-color: black;
+    border-style: solid;
+    left: 10px;
     top: -10px;
-    border-radius: 5px;
 
 }
 
-h2{
-    text-align: center;
+.watersource .Tankerstatus{
+
+    position: relative;
+    background-color: #dc1212;
+    border-radius: 50%;
+    margin: 0px;
+    width: 30px;
+    height: 30px;
+    border-color: black;
+    border-style: solid;
+    left: 15px;
+    top: -10px;
+
+
+}
+
+
+
+.watersource .cauverystatus{
+
+    position: relative;
+    background-color: #dc1212;
+    border-radius: 50%;
+    margin: 0px;
+    width: 30px;
+    height: 30px;
+    border-color: black;
+    border-style: solid;
+    left: 25px;
+    top: -10px;
+
+
+
+}
+
+.watersource .rainwaterstatus{
+
+    position: relative;
+    background-color: #0c8e17;
+    border-radius: 50%;
+    margin: 0px;
+    width: 30px;
+    height: 30px;
+    border-color: black;
+    border-style: solid;
+    left: 20px;
+    top: -10px;
+
 
 }
