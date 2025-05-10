@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WaterLevel Controller</title>
+<link rel="stylesheet" href="./index.css"> 
+<script type="text/javascript" src="./script.js"> </script>
+</head>
+
+<body>
+    <header>
+        <h1>Water Level Controller </h1>
+    </header>
+    <main   class="main-container">
+
+        <section class="firstcontainer">
+
+
+            <div class="table-responsive">
+
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Water Level</th>
+                        <th>Time </th>
+
+                    </tr>
+                    <tr>
+                        <td id="datetime"></td>
+                        <td id="tableWaterlevel">CM</td>
+                        <td id="currenttime"> </td>
+                    </tr>
+                </table>
+
+            </div>
+
+
+            <div class="operations">
+            <label >Sintex Tank </label><br>
+            <input type="text" id="swaterper" name="fname" value="CM"><br><br>
+                <progress id="file" value="%" max="100">  </progress><br><br>
+
+
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider round"></span>
+              </label> <br>
+
+
+            <label>Motar Manual Operations</label><br>
+            <button onclick="turnOnRelay()" type="button">ON</button>
+            <button onclick="turnOffRelay()">OFF</button>
+            </div>
+
+            <div id="watertank">
+
+                <div class="water-level" id="water-level1"></div>
+                <div class="water-level" id="water-level2"></div>
+                <div class="water-level" id="water-level3"></div>
+                <div class="water-level" id="water-level4"></div>
+                <div class="water-level" id="water-level5"></div>
+                <div class="water-level" id="water-level6"></div>
+
+            </div>
+
+    
+
+
+        </section>
+
+
+
+
+        <section class="secondcontainer">
+
+            <div class="table-responsive">
+
+                <table>
+
+                    <tr>
+                        <th>Water Level</th>
+                        <th>TDS Level </th>
+                    </tr>
+                    <tr>
+                        <td id="tableWaterlevel1">CM</td>
+                        <td>123 </td>
+                    </tr>
+
+
+
+                </table>
+            </div>
+       <div class="operations">
+            <label for="fname">Sump Tank</label><br>
+            <input type="text" id="twaterper" name="fname" value="CM"><br><br>
+            <progress id="watertankper" value ="%" max="100"> 90% </progress><br><br>
+
+
+
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider round"></span>
+              </label> <br>
+
+
+            <label for="fname">Motar Manual Operations</label><br>
+            <button disabled >  ON</button>
+           <button disabled>OFF</button>
+       </div>
+            <div id="sumptank">
+
+                <div class="water-level" id="sumpwater-level"></div>
+                <div class="water-level" id="sumpwater-level2"></div>
+                <div class="water-level" id="sumpwater-level3"></div>
+                <div class="water-level" id="sumpwater-level4"></div>
+                <div class="water-level" id="sumpwater-level5"></div>
+                <div class="water-level" id="sumpwater-level6"></div>
+
+            </div>
+
+        </section>
+
+
+
+    </main>
+    
+
+</html>
