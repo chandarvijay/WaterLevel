@@ -7,10 +7,14 @@
 #include "ArduinoOTA.h"
 
 //int builtinled = T2;
-int Relay = 15;
+int Relay = 25;
 const char* ssid = "Uma Nelayam 4G";
 const char* password = "9980337734";
 const char* ota_password = "12345";
+
+
+unsigned long lastManualActionTime = 0; // Timestamp of the last manual action
+const unsigned long manualTimeout = 90000; // 5 seconds timeout (adjust as needed)
 
 
 float distance;
@@ -24,6 +28,9 @@ int second_trigger = 27;
 
 float seconddistance;
 float secondduration;
+
+bool manualOverride = false;
+
 
 // No changes made today 
 
@@ -45,7 +52,7 @@ void welcome() {
     <script type="text/javascript"> 
 
 
-socket = new WebSocket('ws://192.168.1.77:81');
+socket = new WebSocket('ws://192.168.1.92:81');
 let heartbeatInterval;
 
 socket.onopen = function (e) {
@@ -94,130 +101,7 @@ socket.onerror = function (error) {
 
     </script>
 
-    
-<style>
-h1{
-background-color: rgb(99, 99, 176);
-border: 2px solid black;
-border-radius: 20px;
-color: white;
-text-align: center;
-padding: 10px;
 
-}
-
-h2{
-background-color: rgb(74, 137, 183);
-text-align: left ;
-color: rgb(26, 23, 23);
-}
-
-section{
-
-    border: 2px solid black;
-    border-radius: 50px;
-    padding: 50px;
-
-}
-button{
-    background-color: black;
-    color: white;
-    border: 4px solid black;
-    size: 10px;
-    border-radius: 10px;
-
-
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-  
-  .switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
-
-  #watertank1{
-    position: absolute;
-    top: 25%;
-    left: 42%;
-    border: #1274d6c9;
-    border-style: solid;
-    height: 200px;
-    width: 10%;
-    background-color: #ffffffc9;
-    border-radius: 10px;
-    
-
-  }
-
-
-#sumptank{
-    position: absolute;
-    top: 63%;
-    left: 28%;
-    border: #1274d6c9;
-    border-style: solid;
-    height: 220px;
-    width: 30%;
-    background-color: #ffffffc9;
-    border-radius: 10px;
-
-  }
-
-</style>
 </head>
 
 <body>
@@ -227,52 +111,21 @@ button{
     <main>
         <section>
             <h2>SUMP Water Level</h2> 
-            <p>Sump tank that is pumped up to the water tank</p>
             <label for="fname">Water Percentage</label><br>
             <input type="text" id="swaterper" name="fname" value="CM"><br><br>
             <progress id="file" value="%" max="100">  </progress><br><br>
 
-            <div id="watertank">
-               
-                <div class="water-level" id="water-level"></div>
-                <div class="water-level" id="water-level2"></div>
-                <div class="water-level" id="water-level3"></div>
-                <div class="water-level" id="water-level4"></div>
-                <div class="water-level" id="water-level5"></div>
-    
-            </div>
-
-
-            <label class="switch">
-                <input type="checkbox" checked>
-                <span class="slider round"></span>
-              </label> <br>
-
-
-            <label for="fname">Motar Manual Operations</label><br>
-            <button>ON</button>
-            <button>OFF</button>
 
         </section>
         <section>
             <h2>Sintex Water Tank</h2>
-            <p>Water Tank Place on the Builing </p>
             <label for="fname">Water Percentage</label><br>
             <input type="text" id="twaterper" name="fname" value="CM"><br><br>
             <progress id="watertankper" value ="%" max="100"> 90% </progress><br><br>
 
 
 
-            <label class="switch">
-                <input type="checkbox" checked>
-                <span class="slider round"></span>
-              </label> <br>
-
-
-            <label for="fname">Motar Manual Operations</label><br>
             
-            <button onclick="motaron">ON</button>
-            <button onclick="motaroff">OFF</button>
         </section>
     </main>
     <footer>
@@ -345,6 +198,7 @@ void webSocketEvent(uint8_t num,WStype_t type,uint8_t * payload, size_t length)
 
 }
 
+
 void setup() {
 
 
@@ -366,10 +220,25 @@ void setup() {
     Serial.print("wifi connected ");
 
     Serial.print(WiFi.localIP());
-
   }
 
 
+
+// Define the route to turn ON the relay
+    server.on("/relayOn", HTTP_GET, []() {
+        lastManualActionTime = millis(); // Record the time of the manual action
+        digitalWrite(Relay, HIGH); // Turn ON the relay
+        server.send(200, "text/plain", "Relay is ON");
+    });
+
+    // Define the route to turn OFF the relay
+    server.on("/relayOff", HTTP_GET, []() {
+        lastManualActionTime = millis(); // Record the time of the manual action
+        digitalWrite(Relay, LOW); // Turn OFF the relay
+        server.send(200, "text/plain", "Relay is OFF");
+    });
+
+    // Start the server
 
   ArduinoOTA.begin();
   server.on("/", welcome);
@@ -389,28 +258,25 @@ void setup() {
   pinMode(second_echo,INPUT);
   pinMode(second_trigger,OUTPUT);
 
+  digitalWrite(Relay, LOW); 
 
 }
 void loop() {
 
+  server.handleClient();
+  server.send(200, "text/html");
+  server.send(404, "text/html");
 
-ArduinoOTA.handle();
-//Http Post 
+  ArduinoOTA.handle();
 
-  HTTPClient http;
-
-  http.begin("http://192.168.1.77/config"); 
-  http.addHeader("Content-type", "application/json" );
-  int httpResponsecoce = http.POST("Posting from esp32");
-  
-  if (httpResponsecoce > 0) {
-
-    String response = http.getString();
-    Serial.print("httpResponsecoce");
-    Serial.print("response");
-
-  }
-
+    if (millis() - lastManualActionTime > manualTimeout) {
+        // Automatic control logic
+        if (distance > 70 && seconddistance < 70) {
+            digitalWrite(Relay, HIGH); // Turn the relay ON
+        } else if (distance <= 20) {
+            digitalWrite(Relay, LOW); // Turn the relay OFF
+        }
+    }
 
 //Ultrasonic 
 
@@ -442,20 +308,19 @@ Serial.print(distance);
 Serial.print("The distance of the second is \n");
 Serial.print(seconddistance);
 
-if(distance > 70 && seconddistance < 70 ){
+//if(distance > 70 && seconddistance < 70 ){
 
-digitalWrite(Relay,HIGH);
 
-}else if(distance <= 20 )
-{
-  digitalWrite(Relay, LOW);
+//digitalWrite(Relay,HIGH);
 
-}
+//}else if(distance <= 20 )
+//{
+  //digitalWrite(Relay, LOW);
+
+//}
 
 //Webserver 
-  server.handleClient();
-  server.send(200, "text/html");
-  server.send(404, "text/html");
+
 
 
 //WebSockets 
